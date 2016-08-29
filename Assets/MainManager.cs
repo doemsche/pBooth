@@ -24,4 +24,8 @@ public class MainManager : MonoBehaviour {
 		Texture2D snap = videotexture.RecordFrame();
 		railmanager.AddToRail(snap);
 	}
+
+	public void Preview(){
+		railmanager.Preview();
+	}
 }

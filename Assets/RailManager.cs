@@ -3,22 +3,27 @@ using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Collections;
-
+using System.Threading;
+using UnityToolbag;
 public class RailManager : MonoBehaviour {
 
-	public Hashtable frames;
+	public Dictionary<string, Texture2D> frames;
 	public RectTransform railprefab;
 	public RectTransform list;
+	public RectTransform preview;
+
+	private GUIManager guimanager;
 
 	void Start(){
-		frames = new Hashtable();
+		frames = new Dictionary<string,Texture2D>();
+		guimanager = Object.FindObjectOfType<GUIManager>();
 	}
 
 	public void AddToRail(Texture2D snap){
 		//add to memory
 		string key = snap.GetInstanceID().ToString();
-		UnityEngine.Debug.Log(key);
 		frames.Add(key,snap);
 		//add to gui
 		Sprite sprite = Sprite.Create(snap, new Rect(0,0,snap.width,snap.height), new Vector2(0,0));
@@ -36,18 +41,50 @@ public class RailManager : MonoBehaviour {
 
 	public void RenderSequence(string session){
 		//UnityEngine.Debug.Log(frames.Count);
+		var list = frames.Keys.ToList(); 
+		list.Sort();
 		int i = 1;
-		foreach( Texture2D t in frames.Values ){
-			//UnityEngine.Debug.Log(t);
-			System.IO.File.WriteAllBytes("/Users/dschlaepfer/tmp/" + session + i.ToString()+ ".png", t.EncodeToPNG());
+		foreach( var key in list ){
+			//UnityEngine.Debug.Log(frames[key]);
+			System.IO.File.WriteAllBytes("/Users/dschlaepfer/tmp/" + session + i.ToString()+ ".png", frames[key].EncodeToPNG());
 			i++;
 		}
 
-		ProcessStartInfo proc = new ProcessStartInfo();
-		proc.FileName = "ruby";
-		proc.WorkingDirectory = "/Users/dschlaepfer/tmp/";
-		proc.Arguments = "agif.rb";
-		Process.Start(proc);
+		Process proc = new Process();
+		proc.StartInfo.FileName = "ruby";
+		proc.StartInfo.WorkingDirectory = "/Users/dschlaepfer/tmp/";
+		proc.StartInfo.Arguments = "agif.rb";
+		proc.EnableRaisingEvents = true;
+		proc.Exited += new System.EventHandler(this.ProcessFinished);
+		proc.Start();
+	}
 
+	private void ProcessFinished(object sender,System.EventArgs e){
+		//Use UnityToolbag for executing code in the main thread
+		Dispatcher.Invoke(()=>{
+			guimanager.OnRenderEnd();	
+		});
+	}
+
+	public void Preview(){
+		StartCoroutine(PlayMoviePreview());
+	}
+
+	private IEnumerator PlayMoviePreview(){
+		WaitForSeconds wait = new WaitForSeconds(0.5f);
+		Image tmpPreview = preview.GetComponent<Image>();
+		int count = frames.Count;
+		int counter = 0;
+		foreach( Texture2D t in frames.Values){
+			//UnityEngine.Debug.Log("yield");
+			Sprite tmpSprite = Sprite.Create(t, new Rect(0,0,t.width,t.height), new Vector2(0,0));
+			tmpPreview.sprite = tmpSprite;
+			yield return wait;
+			counter ++;
+			if(counter == count){
+				//UnityEngine.Debug.Log("alles fertig");
+				guimanager.OnPreviewEnd();
+			}
+		}
 	}
 }

@@ -3,46 +3,42 @@ using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Collections;
 
 public class RailManager : MonoBehaviour {
 
-	public List<Texture2D> frames;
-	public Image railprefab;
+	public Hashtable frames;
+	public RectTransform railprefab;
+	public RectTransform list;
 
 	void Start(){
-		frames = new List<Texture2D>();
+		frames = new Hashtable();
 	}
 
 	public void AddToRail(Texture2D snap){
 		//add to memory
-		frames.Add(snap);
-
+		string key = snap.GetInstanceID().ToString();
+		UnityEngine.Debug.Log(key);
+		frames.Add(key,snap);
 		//add to gui
-		float xOffset = frames.Count-1 * 1.60f;
-		Image railObj = Instantiate<Image>(railprefab);
 		Sprite sprite = Sprite.Create(snap, new Rect(0,0,snap.width,snap.height), new Vector2(0,0));
-		railObj.GetComponent<Image>().sprite = sprite;
-		railObj.transform.SetParent(this.transform);
-		railObj.transform.localScale = Vector3.one;
-		railObj.transform.position = new Vector3(xOffset,0,0);
+		RectTransform thumb = Instantiate(railprefab,list.transform.position,Quaternion.identity,list.transform) as RectTransform;
+		thumb.GetComponent<Image>().sprite = sprite;
+		thumb.GetComponent<Image>().preserveAspect = true;
+		thumb.GetComponentInChildren<Button>().GetComponent<RemoveAtKey>().key = key;
 	}
 
-	public void RemoveFromRail(){
-		int cnt = frames.Count;
-		if(cnt < 1){
-			return;
-		}
+	public void RemoveAtIndex(string key){
 		//remove from memory
-		frames.RemoveAt(cnt-1);
-
-		//remove from gui
-		Image delImg = GetComponentsInChildren<Image>()[cnt-1];
-		Destroy(delImg);
+		frames.Remove(key);
+		//gui object is removed by button (self-destroy)
 	}
 
 	public void RenderSequence(string session){
+		//UnityEngine.Debug.Log(frames.Count);
 		int i = 1;
-		foreach( Texture2D t in frames ){
+		foreach( Texture2D t in frames.Values ){
+			//UnityEngine.Debug.Log(t);
 			System.IO.File.WriteAllBytes("/Users/dschlaepfer/tmp/" + session + i.ToString()+ ".png", t.EncodeToPNG());
 			i++;
 		}

@@ -16,10 +16,6 @@ public class MainManager : MonoBehaviour {
 		}
 	}
 
-	public void RemoveFromRail(){
-		railmanager.RemoveFromRail();
-	}
-
 	public void Render(){
 		railmanager.RenderSequence("sessionX");
 	}

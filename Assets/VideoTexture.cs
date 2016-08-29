@@ -42,10 +42,33 @@ public class VideoTexture : MonoBehaviour {
 	public Texture2D RecordFrame(){
 		snap = new Texture2D(webcamTexture.width, webcamTexture.height);
 		snap.SetPixels(webcamTexture.GetPixels());
+
 		snap.Apply();
 		return snap;
 	}
 
+
+	public void ApplyEffect(string name){
+		Color color = Color.white;
+		switch(name){
+			case "red":
+			color = Color.red;
+				break;
+			case "blue":
+			color = Color.blue;
+				break;
+			case "green":
+			color = Color.green;
+				break;
+			case "yellow":
+			color = Color.yellow;
+				break;
+			default:
+			color = Color.white;
+				break;
+		}
+		GetComponent<RawImage>().color = color;
+	}
 
 
 //	public void SavePicture(){

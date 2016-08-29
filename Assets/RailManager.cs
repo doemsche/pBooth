@@ -71,7 +71,7 @@ public class RailManager : MonoBehaviour {
 	}
 
 	private IEnumerator PlayMoviePreview(){
-		WaitForSeconds wait = new WaitForSeconds(0.5f);
+		WaitForSeconds wait = new WaitForSeconds(guimanager.framerate.value);
 		Image tmpPreview = preview.GetComponent<Image>();
 		int count = frames.Count;
 		int counter = 0;

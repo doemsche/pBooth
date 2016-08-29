@@ -28,4 +28,8 @@ public class MainManager : MonoBehaviour {
 	public void Preview(){
 		railmanager.Preview();
 	}
+
+	public void ApplyEffect(string name){
+		videotexture.ApplyEffect(name);
+	}
 }

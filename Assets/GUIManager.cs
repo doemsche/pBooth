@@ -8,6 +8,7 @@ public class GUIManager : MonoBehaviour {
 	public Button record;
 	public Button render;
 	public Text processing;
+	public Slider framerate;
 
 	private RailManager rm;
 

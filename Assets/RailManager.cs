@@ -41,19 +41,20 @@ public class RailManager : MonoBehaviour {
 
 	public void RenderSequence(string session){
 		//UnityEngine.Debug.Log(frames.Count);
+		System.IO.Directory.CreateDirectory("/Users/dschlaepfer/tmp/"+session);
 		var list = frames.Keys.ToList(); 
 		list.Sort();
 		int i = 1;
 		foreach( var key in list ){
 			//UnityEngine.Debug.Log(frames[key]);
-			System.IO.File.WriteAllBytes("/Users/dschlaepfer/tmp/" + session + i.ToString()+ ".png", frames[key].EncodeToPNG());
+			System.IO.File.WriteAllBytes("/Users/dschlaepfer/tmp/" + session +"/f_"+ i.ToString()+ ".png", frames[key].EncodeToPNG());
 			i++;
 		}
 
 		Process proc = new Process();
 		proc.StartInfo.FileName = "ruby";
 		proc.StartInfo.WorkingDirectory = "/Users/dschlaepfer/tmp/";
-		proc.StartInfo.Arguments = "agif.rb";
+		proc.StartInfo.Arguments = "agif.rb "+session;
 		proc.EnableRaisingEvents = true;
 		proc.Exited += new System.EventHandler(this.ProcessFinished);
 		proc.Start();

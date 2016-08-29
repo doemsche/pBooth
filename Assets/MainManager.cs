@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.SceneManagement;
 public class MainManager : MonoBehaviour {
 
 	public VideoTexture videotexture;
@@ -17,7 +17,8 @@ public class MainManager : MonoBehaviour {
 	}
 
 	public void Render(){
-		railmanager.RenderSequence("sessionX");
+		var session = System.Guid.NewGuid().ToString().Substring(0,8);
+		railmanager.RenderSequence(session);
 	}
 
 	public void Record(){
@@ -31,5 +32,9 @@ public class MainManager : MonoBehaviour {
 
 	public void ApplyEffect(string name){
 		videotexture.ApplyEffect(name);
+	}
+
+	public void ResetApp(){
+		SceneManager.LoadScene("photobooth");
 	}
 }

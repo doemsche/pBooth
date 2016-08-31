@@ -10,7 +10,19 @@ public class EffectsManager : MonoBehaviour {
 	public Button yellow;
 	private MainManager mm;
 
+	private string effectColor;
+
+	public string eColor {
+		get{
+			return effectColor;
+		}
+		set{
+			effectColor = value;
+		}
+	}
+
 	void Start () {
+		
 		mm = Object.FindObjectOfType<MainManager>();
 		red = GetComponentsInChildren<Button>()[0];
 		green = GetComponentsInChildren<Button>()[1];
@@ -25,5 +37,7 @@ public class EffectsManager : MonoBehaviour {
 
 	private void ApplyEffect(string colorname){
 		mm.ApplyEffect(colorname);
+		eColor = colorname;
 	}
+		
 }
